@@ -138,7 +138,7 @@ const DOMlogic = ((doc) => {
 
   const scoreUpY = () => {
     scoreY++;
-    scoreYPanel.textContent = `X score: ${scoreY} `;
+    scoreYPanel.textContent = `Y score: ${scoreY} `;
   };
 
   return { gameEndPopup, scoreUpX, scoreUpY };
