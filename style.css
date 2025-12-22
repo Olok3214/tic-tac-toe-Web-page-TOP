@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100vh;
+  font-family: monospace;
+  background-color: #000000;
+  color: #FFF6E0;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10rem;
+  padding: 1rem;
+  gap: 1rem;
+  text-align: center;
+}
+header h1 {
+  font-size: 5em;
+}
+header div {
+  gap: 4rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5em;
+}
+
+main {
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 25rem;
+  height: 25rem;
+  justify-content: center;
+  position: relative;
+}
+main button {
+  font-size: 4rem;
+  background-color: #000000;
+  border: none;
+  color: #FFF6E0;
+  border: 2px solid #FFF6E0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+main button:hover {
+  background-color: #161616;
+}
+
+#GameEndPopUp {
+  width: 25rem;
+  height: 25rem;
+  position: absolute;
+  display: none;
+}
+#GameEndPopUp .PopUpMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 25rem;
+  height: 25rem;
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+  gap: 1rem;
+}
+#GameEndPopUp .PopUpMenu p {
+  text-align: center;
+  width: auto;
+  font-size: 2em;
+  background-color: #000000;
+  border-radius: 1rem;
+  padding: 0.4rem;
+}
+#GameEndPopUp .PopUpMenu button {
+  border-radius: 1rem;
+  padding: 0.4rem;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+}
+footer img {
+  width: 2.5rem;
+  padding: 1rem;
+}/*# sourceMappingURL=style.css.map */
