@@ -1,1 +1,1 @@
-TIC TAC TOE page# tic-tac-toe-Web-page-TOP
+Minimalistic Tic Tac Toe game for The Odin Project

@@ -57,8 +57,7 @@ const Player = (() => {
   //Returns curent player and changes next player
   const getCurrentPlayer = () => {
     const prewPlayer = currentPlayer;
-    currentPlayer =
-      prewPlayer === playerOneMarker ? playerTwoMarker : playerOneMarker;
+    currentPlayer = prewPlayer === playerOneMarker ? playerTwoMarker : playerOneMarker;
     return prewPlayer;
   };
 
