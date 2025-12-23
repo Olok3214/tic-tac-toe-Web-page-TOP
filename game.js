@@ -21,7 +21,7 @@ const gameBoard = (() => {
 })();
 
 const Player = (() => {
-    const markers = ["X", "Y"];
+    const markers = ["X", "O"];
     let turn = 0;
 
     const getCurrentPlayer = () => markers[turn % 2];
