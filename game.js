@@ -1,144 +1,102 @@
 const gameBoard = (() => {
-  let board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-  const winCombos = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
+    let board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const winCombos = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Cols
+        [0, 4, 8], [2, 4, 6],             // Diagonals
+    ];
 
-  const isMovePosibble = (position) => {
-    if (board[position] == 0) {
-      return true;
-    } else {
-      return false;
-    }
-  };
+    const isMovePossible = (position) => board[position] === 0;
+    const changeBoard = (position, marker) => { board[position] = marker; };
+    const getBoard = () => [...board]; // Return a copy to protect the state
+    const resetBoard = () => { board = [0, 0, 0, 0, 0, 0, 0, 0, 0]; };
 
-  const changeBoard = (position, marker) => {
-    board[position] = marker;
-  };
+    const checkWin = (marker) => {
+        return winCombos.some(combo => 
+            combo.every(index => board[index] === marker)
+        );
+    };
 
-  const getBoard = () => {
-    return board;
-  };
-
-  const checkWin = (curentplayer) => {
-    for (let i = 0; i < winCombos.length; i++) {
-      const [a, b, c] = winCombos[i];
-      // Check if all cells in the combo belong to the current player
-      if (
-        board[a] === curentplayer &&
-        board[b] === curentplayer &&
-        board[c] === curentplayer
-      ) {
-        return true; //curent player wins
-      }
-    }
-    return false;
-  };
-
-  const resetBoard = () => {
-    board = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-  };
-
-  return { changeBoard, checkWin, resetBoard, isMovePosibble, getBoard };
+    return { changeBoard, checkWin, resetBoard, isMovePossible, getBoard };
 })();
 
 const Player = (() => {
-  const playerOneMarker = "X";
-  const playerTwoMarker = "Y";
-  let currentPlayer = playerOneMarker;
+    const markers = ["X", "Y"];
+    let turn = 0;
 
-  //Returns curent player and changes next player
-  const getCurrentPlayer = () => {
-    const prewPlayer = currentPlayer;
-    currentPlayer = prewPlayer === playerOneMarker ? playerTwoMarker : playerOneMarker;
-    return prewPlayer;
-  };
+    const getCurrentPlayer = () => markers[turn % 2];
+    const switchTurn = () => { turn++; };
+    const resetTurn = () => { turn = 0; };
 
-  return { getCurrentPlayer };
+    return { getCurrentPlayer, switchTurn, resetTurn };
 })();
 
 const gameLogic = (() => {
-  const checkGameState = (curentplayer) => {
-    if (gameBoard.checkWin(curentplayer) === true) {
-      let message = "WON: " + curentplayer;
-      DOMlogic.gameEndPopup(message);
+    let active = true;
 
-      if (curentplayer === "X") {
-        DOMlogic.scoreUpX();
-      } else {
-        DOMlogic.scoreUpY();
-      }
-    } else if (gameBoard.getBoard().indexOf(0) === -1) {
-      DOMlogic.gameEndPopup("IT IS A DRAW");
-    }
-  };
+    const playerMove = (index) => {
+        if (!active || !gameBoard.isMovePossible(index)) return;
 
-  const playerMove = (position) => {
-    //Gets current player (X or Y) and sets on console
+        const currentPlayer = Player.getCurrentPlayer();
+        gameBoard.changeBoard(index, currentPlayer);
+        DOMlogic.render();
 
-    //Checks if the move is possible, if no does nothing
-    if (gameBoard.isMovePosibble(position)) {
-      let curentPlayer = Player.getCurrentPlayer();
-      gameBoard.changeBoard(position, curentPlayer);
-      checkGameState(curentPlayer);
-    }
-  };
+        if (gameBoard.checkWin(currentPlayer)) {
+            active = false;
+            DOMlogic.gameEndPopup(`WON: ${currentPlayer}`);
+            currentPlayer === "X" ? DOMlogic.scoreUpX() : DOMlogic.scoreUpY();
+        } else if (!gameBoard.getBoard().includes(0)) {
+            active = false;
+            DOMlogic.gameEndPopup("IT IS A DRAW");
+        } else {
+            Player.switchTurn();
+        }
+    };
 
-  return { playerMove };
+    const restart = () => {
+        active = true;
+        gameBoard.resetBoard();
+        Player.resetTurn();
+        DOMlogic.render();
+    };
+
+    return { playerMove, restart };
 })();
 
 const DOMlogic = ((doc) => {
-  const buttons = doc.querySelectorAll('[id^="panel"]');
-  const popUpPaned = doc.getElementById("GameEndPopUp");
-  const restartBtn = doc.getElementById("restartbtn");
-  const resultPanel = doc.getElementById("result");
-  const scoreXPanel = doc.getElementById("scoreX");
-  const scoreYPanel = doc.getElementById("scoreY");
+    const buttons = doc.querySelectorAll('[id^="panel"]');
+    const popUpPanel = doc.getElementById("GameEndPopUp");
+    const restartBtn = doc.getElementById("restartbtn");
+    const resultPanel = doc.getElementById("result");
+    const scoreXPanel = doc.getElementById("scoreX");
+    const scoreYPanel = doc.getElementById("scoreY");
 
-  let scoreX = 0;
-  let scoreY = 0;
+    let scoreX = 0;
+    let scoreY = 0;
 
-  buttons.forEach((btn, index) => {
-    btn.addEventListener("click", () => {
-      gameLogic.playerMove(index);
-      const board = gameBoard.getBoard();
-      btn.textContent = board[index];
-    });
-  });
+    const render = () => {
+        const board = gameBoard.getBoard();
+        buttons.forEach((btn, i) => {
+            btn.textContent = board[i] === 0 ? "" : board[i];
+        });
+    };
 
-  restartBtn.addEventListener("click", () => {
-    gameBoard.resetBoard();
-    popUpPaned.style.display = "none";
-    resetBtns();
-  });
-
-  const gameEndPopup = (message) => {
-    popUpPaned.style.display = "block";
-    resultPanel.textContent = message;
-  };
-
-  const resetBtns = () => {
     buttons.forEach((btn, index) => {
-      btn.textContent = " ";
+        btn.addEventListener("click", () => gameLogic.playerMove(index));
     });
-  };
 
-  const scoreUpX = () => {
-    scoreX++;
-    scoreXPanel.textContent = `X score: ${scoreX} `;
-  };
+    restartBtn.addEventListener("click", () => {
+        gameLogic.restart();
+        popUpPanel.style.display = "none";
+    });
 
-  const scoreUpY = () => {
-    scoreY++;
-    scoreYPanel.textContent = `Y score: ${scoreY} `;
-  };
+    const gameEndPopup = (message) => {
+        popUpPanel.style.display = "block";
+        resultPanel.textContent = message;
+    };
 
-  return { gameEndPopup, scoreUpX, scoreUpY };
+    const scoreUpX = () => { scoreX++; scoreXPanel.textContent = `X score: ${scoreX}`; };
+    const scoreUpY = () => { scoreY++; scoreYPanel.textContent = `O score: ${scoreY}`; };
+
+    return { gameEndPopup, scoreUpX, scoreUpY, render };
 })(document);
